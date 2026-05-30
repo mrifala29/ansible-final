@@ -1,0 +1,4 @@
+---
+# defaults for databases/elasticsearch role
+elasticsearch_cluster_name: my-cluster
+elasticsearch_http_port: 9200

@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  {{ qdrant_container_name }}:
+    image: {{ qdrant_image }}
+    container_name: {{ qdrant_container_name }}
+    restart: {{ qdrant_restart_policy }}
+
+    ports:
+{% for port in qdrant_ports %}
+      - "{{ port }}"
+{% endfor %}
+
+    volumes:
+      - {{ qdrant_data_dir }}:/qdrant/storage
+
+    environment:
+      QDRANT__SERVICE__HTTP_PORT: 6333
+      QDRANT__SERVICE__GRPC_PORT: 6334

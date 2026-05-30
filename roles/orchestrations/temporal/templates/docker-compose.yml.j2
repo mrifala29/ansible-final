@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  temporal:
+    image: {{ temporal_image }}
+    container_name: {{ temporal_container_name }}
+    hostname: temporal
+    ports:
+      - "{{ temporal_grpc_port }}:7233"
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=linkit_temporal
+      - POSTGRES_PWD=l1nkit360_
+      - POSTGRES_SEEDS={{ ansible_host }}
+      - POSTGRES_DB=temporal
+      - VISIBILITY_DB=temporal_visibility
+      - SKIP_DB_CREATE=true
+      - SKIP_SCHEMA_SETUP=false
+      - ENABLE_ES=false
+      - TEMPORAL_ADDRESS=temporal:7233
+    networks:
+      - temporal-network
+    restart: {{ temporal_restart_policy }}
+
+  temporal-ui:
+    image: {{ temporal_ui_image }}
+    container_name: {{ temporal_ui_container_name }}
+    hostname: temporal-ui
+    ports:
+      - "{{ temporal_ui_port }}:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:{{ temporal_ui_port }}
+    depends_on:
+      - temporal
+    networks:
+      - temporal-network
+    restart: {{ temporal_restart_policy }}
+
+networks:
+  temporal-network:
+    driver: bridge

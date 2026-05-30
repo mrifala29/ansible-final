@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  qr-app:
+    container_name: {{ app_name }}
+    build: .
+    ports:
+      - "3131:3000"
+    volumes:
+      - ./public:/app/public
+    restart: unless-stopped

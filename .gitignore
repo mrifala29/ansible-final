@@ -1,7 +1,11 @@
-**/docker-compose-psql.yml
-**/docker-compose.yml
-**/docker-compose.j2
-**/docker-compose.yml.j2
+# Ignore generated/deployed docker-compose files (not templates)
+docker-compose-psql.yml
+docker-compose.yml
+
+# Allow template files in roles/*/templates/
+!roles/**/templates/*.j2
+!roles/**/templates/*.yml.j2
+
 **/Dockerfile
 **/Dockerfile.j2
 

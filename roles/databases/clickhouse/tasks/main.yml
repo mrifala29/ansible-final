@@ -10,7 +10,7 @@
 
 - name: Copy docker-compose file
   template:
-    src: docker-compose.yml
+    src: docker-compose.yml.j2
     dest: /opt/clickhouse/docker-compose.yml
 
 - name: Run ClickHouse container

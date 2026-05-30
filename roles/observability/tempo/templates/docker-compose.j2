@@ -1,0 +1,12 @@
+services:
+  {{ service_name }}:
+    image: {{ service_image }}
+    container_name: {{ service_name }}
+    ports:
+      - "{{ service_http_port }}:3200"
+      - "{{ service_grpc_port }}:4317"
+    volumes:
+      - "{{ service_data_dir }}:/tmp/tempo"
+      - "{{ service_compose_dir }}/tempo.yaml:/etc/tempo/tempo.yaml:ro"
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    restart: always

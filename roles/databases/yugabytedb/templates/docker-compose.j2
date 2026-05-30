@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  yugabytedb:
+    image: yugabytedb/yugabyte:{{ yugabytedb_version }}
+    container_name: yugabytedb
+    command:
+      - bin/yugabyted
+      - start
+      - --daemon=false
+      - --base_dir=/home/yugabyte/var
+      - --data_dir=/home/yugabyte/yb_data
+      - --log_dir=/home/yugabyte/yb_logs
+      - --master_flags=cluster_name={{ yugabytedb_cluster_name }},use_memory_defaults_optimized_for_ysql=true
+      - --tserver_flags=cluster_name={{ yugabytedb_cluster_name }},use_memory_defaults_optimized_for_ysql=true
+    ports:
+      - "{{ yugabytedb_master_port }}:7000"
+      - "{{ yugabytedb_tserver_port }}:9000"
+      - "{{ yugabytedb_yql_port }}:9042"
+      - "{{ yugabytedb_ysql_port }}:5433"
+      - "15433:15433"
+    volumes:
+      - "{{ yugabytedb_data_dir }}:/home/yugabyte/yb_data"
+      - "{{ yugabytedb_log_dir }}:/home/yugabyte/yb_logs"
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+      core:
+        soft: -1
+        hard: -1
+    restart: unless-stopped

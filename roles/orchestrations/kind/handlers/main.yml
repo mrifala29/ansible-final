@@ -1,0 +1,4 @@
+---
+- name: Restart kind cluster
+  command: kind delete cluster --name "{{ kind_cluster_name }}"
+  ignore_errors: yes

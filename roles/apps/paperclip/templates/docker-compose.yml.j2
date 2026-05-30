@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database (required for Paperclip)
+  postgres:
+    container_name: {{ postgres_container_name }}
+    image: {{ postgres_image }}
+    restart: {{ paperclip_restart_policy }}
+    environment:
+      POSTGRES_DB: {{ postgres_db }}
+      POSTGRES_USER: {{ postgres_user }}
+      POSTGRES_PASSWORD: {{ postgres_password }}
+    volumes:
+      - {{ postgres_data_dir }}:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ postgres_user }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - paperclip-net
+
+  # Paperclip Application
+  paperclip:
+    container_name: {{ paperclip_container_name }}
+    image: {{ paperclip_image }}
+    restart: {{ paperclip_restart_policy }}
+    ports:
+      - "{{ paperclip_port }}:3100"
+    volumes:
+      - {{ paperclip_data_dir }}:/paperclip
+    environment:
+{% for key, value in paperclip_environment.items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - paperclip-net
+
+networks:
+  paperclip-net:
+    driver: bridge

@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  scylla:
+    image: {{ scylla_image }}
+    container_name: {{ scylla_container_name }}
+    restart: always
+    command: >
+      --smp {{ scylla_smp }}
+      --memory {{ scylla_memory }}
+      --overprovisioned 1
+    ports:
+{% for port in scylla_ports %}
+      - "{{ port }}"
+{% endfor %}
+    volumes:
+      - {{ scylla_data_dir }}:/var/lib/scylla

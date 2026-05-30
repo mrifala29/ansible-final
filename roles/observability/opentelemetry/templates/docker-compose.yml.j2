@@ -1,0 +1,18 @@
+services:
+  opentelemetry:
+    image: otel/opentelemetry-collector-contrib:{{ opentelemetry_version }}
+
+    container_name: {{ opentelemetry_container_name }}
+
+    restart: {{ opentelemetry_restart_policy }}
+
+    command:
+      - "--config=/etc/otelcol-contrib/opentelemetry-config.yml"
+
+    volumes:
+      - ./opentelemetry-config.yml:/etc/otelcol-contrib/opentelemetry-config.yml
+
+    ports:
+{% for port in opentelemetry_ports %}
+      - "{{ port }}"
+{% endfor %}

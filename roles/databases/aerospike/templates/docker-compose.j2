@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  {{ aerospike_container_name }}:
+    image: {{ aerospike_image }}
+    container_name: {{ aerospike_container_name }}
+    restart: always
+
+    ports:
+{% for port in aerospike_ports %}
+      - "{{ port }}"
+{% endfor %}
+
+    volumes:
+      - "{{ aerospike_data_dir }}:/opt/aerospike/data"
+      - "{{ aerospike_log_dir }}:/var/log/aerospike"
+      - "{{ aerospike_base_dir }}/aerospike.conf:/etc/aerospike/aerospike.conf"
+
+    ulimits:
+      nofile:
+        soft: 15000
+        hard: 15000

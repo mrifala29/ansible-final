@@ -1,0 +1,156 @@
+version: "3.9"
+
+services:
+  mysql:
+    container_name: openmetadata_mysql
+    image: docker.getcollate.io/openmetadata/db:1.11.4
+    restart: always
+    command: "--sort_buffer_size=64M"
+    environment:
+      MYSQL_ROOT_PASSWORD: "PwdR00tScr33t#45"
+      MYSQL_DATABASE: openmetadata_db
+      MYSQL_USER: openmetadata_user
+      MYSQL_PASSWORD: "PwdOpScr33t#45"
+    volumes:
+      - /opt/openmetadata/data/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysql", "-u", "root", "-pPwdR00tScr33t#45", "-e", "use openmetadata_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - openmetadata_net
+
+  elasticsearch:
+    container_name: openmetadata_elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.4
+    restart: always
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms2g -Xmx2g"
+      xpack.security.enabled: false
+      cluster.routing.allocation.disk.threshold_enabled: false
+    volumes:
+      - /opt/openmetadata/data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9201:9200"
+    networks:
+      - openmetadata_net
+
+  execute-migrate-all:
+    container_name: openmetadata_migrate
+    image: docker.getcollate.io/openmetadata/server:1.11.4
+    command: ["./bootstrap/openmetadata-ops.sh", "migrate"]
+    environment:
+      DB_SCHEME: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: openmetadata_user
+      DB_USER_PASSWORD: "PwdOpScr33t#45"
+      OM_DATABASE: openmetadata_db
+      DB_PARAMS: "allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+
+      ELASTICSEARCH_HOST: elasticsearch
+      ELASTICSEARCH_PORT: 9200
+      ELASTICSEARCH_SCHEME: http
+
+      OPENMETADATA_CLUSTER_NAME: openmetadata-prod
+    depends_on:
+      mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+    networks:
+      - openmetadata_net
+    restart: "no"
+
+  openmetadata-server:
+    container_name: openmetadata_server
+    image: docker.getcollate.io/openmetadata/server:1.11.4
+    restart: always
+    volumes:
+      - /opt/openmetadata/conf/keys:/opt/openmetadata/conf/keys:ro
+    environment:
+      SERVER_PORT: 8585
+      SERVER_ADMIN_PORT: 8586
+      LOG_LEVEL: INFO
+
+      OPENMETADATA_SERVER_URL: http://openmetadata-server:8585
+      SERVER_HOST_API_URL: http://openmetadata-server:8585/api
+      OPENMETADATA_CLUSTER_NAME: openmetadata-prod
+      OPENMETADATA_HEAP_OPTS: "-Xms2G -Xmx2G"
+
+      AUTHENTICATION_PROVIDER: basic
+      AUTHENTICATION_ENABLE_SELF_SIGNUP: "false"
+
+      DB_SCHEME: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: openmetadata_user
+      DB_USER_PASSWORD: "PwdOpScr33t#45"
+      OM_DATABASE: openmetadata_db
+      DB_PARAMS: "allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+
+      ELASTICSEARCH_HOST: elasticsearch
+      ELASTICSEARCH_PORT: 9200
+      ELASTICSEARCH_SCHEME: http
+
+      JWT_ISSUER: open-metadata.org
+      JWT_KEY_ID: prod-key-001
+      RSA_PRIVATE_KEY_FILE_PATH: "/opt/openmetadata/conf/keys/private_key.der"
+      RSA_PUBLIC_KEY_FILE_PATH: "/opt/openmetadata/conf/keys/public_key.der"
+      AUTHENTICATION_JWT_SECRET: "8Fv!dM3r@P#2kL9xQW0E^A7ZyC6H90nU5IvTrvj"
+
+    ports:
+      - "8585:8585"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+      execute-migrate-all:
+        condition: service_completed_successfully
+    networks:
+      - openmetadata_net
+
+  ingestion:
+    container_name: openmetadata_ingestion
+    image: docker.getcollate.io/openmetadata/ingestion:1.11.4
+    restart: always
+    command: ["airflow", "standalone"]
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
+
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_SCHEME: mysql+mysqldb
+      AIRFLOW_DB: airflow_db
+      DB_USER: airflow_user
+      DB_PASSWORD: "AflwDbScreet#123"
+
+      AIRFLOW_USERNAME: admin
+      AIRFLOW_PASSWORD: "AflwUsrScr33t#45"
+
+      OPENMETADATA_SERVER_URL: http://openmetadata-server:8585/api
+
+      AUTHENTICATION_JWT_SECRET: "8Fv!dM3r@P#2kL9xQW0E^A7ZyC6H90nU5IvTrvj"
+      RSA_PUBLIC_KEY_FILE_PATH: "/opt/openmetadata/conf/keys/public_key.der"
+
+    volumes:
+      - /opt/openmetadata/data/airflow/dags:/opt/airflow/dags
+      - /opt/openmetadata/data/airflow/generated:/opt/airflow/dag_generated_configs
+      - /opt/openmetadata/data/airflow/tmp:/tmp
+      - /opt/openmetadata/conf/keys:/opt/openmetadata/conf/keys:ro
+
+    depends_on:
+      - openmetadata-server
+      - mysql
+    networks:
+      - openmetadata_net
+
+networks:
+  openmetadata_net:
+    driver: bridge

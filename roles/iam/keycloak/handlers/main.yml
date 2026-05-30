@@ -1,0 +1,5 @@
+---
+- name: Restart keycloak
+  community.docker.docker_compose_v2:
+    project_src: "{{ keycloak_compose_dir }}"
+    state: restarted

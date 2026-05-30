@@ -1,0 +1,3 @@
+---
+# defaults for testings/k6 role
+k6_version: "0.49.0"

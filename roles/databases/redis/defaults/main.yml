@@ -17,8 +17,8 @@ redis_timeout: 0
 redis_tcp_keepalive: 300
 redis_tcp_backlog: 511
 
-# Redis Auth
-redis_username: "Linkit360"
-redis_password: "L1nkit360"
-redis_requirepass: "L1nkit360"
+# Redis Auth — set nilai di inventory/group_vars/databases.yml
+redis_username: ""
+redis_password: ""
+redis_requirepass: "{{ redis_password }}"
 

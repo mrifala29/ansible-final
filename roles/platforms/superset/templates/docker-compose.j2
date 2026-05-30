@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+
+  superset:
+    build: .
+    container_name: superset_app
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: "Y6sgXsw63d8_fcbwTsh238edhsd_cnVbswHYga8wGja8629_sY"
+      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://superset:sup3rsetPw453@psql_db:5432/superset
+      DATABASE_DB: superset
+      DATABASE_HOST: psql_db
+      DATABASE_PORT: 5432
+      DATABASE_USER: superset
+      DATABASE_PASSWORD: sup3rsetPw453
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      TZ: Asia/Jakarta
+    volumes:
+      - ./superset_home:/app/superset_home
+    depends_on:
+      - psql_db
+      - redis
+    command: >
+      /bin/bash -c "
+      superset db upgrade &&
+      superset init &&
+      superset fab create-admin --username admin --firstname Admin --lastname User --email mail123@test1234.com --password secret45*! &&
+      gunicorn --bind 0.0.0.0:8088 --workers 4 --timeout 120 'superset.app:create_app()'
+      "
+
+  psql_db:
+    image: postgres:15-alpine
+    container_name: superset_psql_db
+    restart: unless-stopped
+    ports:
+      - "5437:5432"
+    environment:
+      POSTGRES_DB: superset
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: sup3rsetPw453
+      TZ: Asia/Jakarta
+    volumes:
+      - ./superset_db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: superset_redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning

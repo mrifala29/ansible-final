@@ -1,0 +1,4 @@
+---
+# defaults for databases/postgres role
+postgres_version: "18"
+postgres_port: 5432

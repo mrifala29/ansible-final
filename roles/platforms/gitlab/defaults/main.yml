@@ -4,4 +4,4 @@ gitlab_package: "gitlab-ce"
 gitlab_edition: "ce"
 
 gitlab_root_email: "admin@example.com"
-gitlab_root_password: "test123!!!"
+# gitlab_root_password — set di inventory/group_vars/platforms.yml

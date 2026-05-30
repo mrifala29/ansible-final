@@ -2,6 +2,7 @@ debezium_base_dir: /opt/debezium
 
 debezium_compose_file: docker-compose.yml
 debezium_psql_compose_file: docker-compose-psql.yml
+# Note: templates are stored as .yml.j2, but deploy dest remains .yml
 
 debezium_network_name: cdc-debezium-network
 
@@ -15,3 +16,9 @@ enable_postgres: false
 
 # Timezone
 timezone: Asia/Jakarta
+
+# SASL / Auth passwords — set nilai di inventory/group_vars/messagings.yml
+debezium_kafka_debezium_password: ""
+debezium_kafka_admin_password: ""
+debezium_kafka_ui_password: ""
+debezium_postgres_password: ""

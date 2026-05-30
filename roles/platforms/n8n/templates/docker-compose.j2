@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  {{ n8n_container_name }}:
+    image: {{ n8n_image }}
+    container_name: {{ n8n_container_name }}
+    restart: {{ n8n_restart_policy }}
+
+    ports:
+{% for port in n8n_ports %}
+      - "{{ port }}"
+{% endfor %}
+
+    volumes:
+      - {{ n8n_data_dir }}:/home/node/.n8n
+
+    environment:
+{% for key, value in n8n_environment.items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}

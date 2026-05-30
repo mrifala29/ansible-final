@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  postgres1:
+    image: postgres:16-alpine
+    container_name: cdc_psql
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: '{{ debezium_postgres_password }}'
+      TZ: Asia/Jakarta
+    ports:
+      - "5439:5432"
+    volumes:
+      - ./db/postgresql:/var/lib/postgresql/data

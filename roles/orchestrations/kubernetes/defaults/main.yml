@@ -1,0 +1,5 @@
+---
+# defaults for orchestrations/kubernetes role
+kubernetes_version: "1.29.0"
+pod_network_cidr: "10.244.0.0/16"
+cluster_name: "baseline-cluster"

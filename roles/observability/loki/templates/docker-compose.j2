@@ -1,0 +1,10 @@
+services:
+  {{ loki_name }}:
+    image: {{ loki_image }}
+    command: -config.file=/etc/loki/loki.yml
+    ports:
+      - "{{ loki_http_port }}:3100"
+    volumes:
+      - "{{ loki_data_dir }}:/loki"
+      - "{{ loki_config_dir }}/loki.yml:/etc/loki/loki.yml"
+    restart: unless-stopped

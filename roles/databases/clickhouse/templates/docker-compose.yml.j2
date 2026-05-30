@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  clickhouse:
+    image: {{ clickhouse_image }}
+    container_name: {{ clickhouse_container_name }}
+    hostname: clickhouse
+    ports: {{ clickhouse_ports }}
+    volumes:
+      - "{{ clickhouse_data_dir }}:/var/lib/clickhouse"
+      - "{{ clickhouse_config_dir }}/users.d:/etc/clickhouse-server/users.d"
+    environment:
+      - CLICKHOUSE_DB=default
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: always

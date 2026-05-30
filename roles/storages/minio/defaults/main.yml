@@ -1,7 +1,8 @@
 minio_version: "RELEASE.2024-01-16T16-07-38Z"
 
-minio_root_user: minioadmin
-minio_root_password: minioadmin123
+# minio_root_user & minio_root_password — set di inventory/group_vars/storages.yml
+minio_root_user: ""
+minio_root_password: ""
 
 minio_data_dir: /data/minio
 minio_compose_dir: /opt/minio

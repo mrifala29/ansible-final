@@ -1,0 +1,4 @@
+---
+# defaults for messagings/rabbitmq role
+rabbitmq_port: 5672
+rabbitmq_management_port: 15672
