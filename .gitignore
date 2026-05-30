@@ -1,28 +1,48 @@
-# Ignore generated/deployed docker-compose files (not templates)
+# ============================================================
+# Generated / deployed docker-compose files (bukan templates)
+# ============================================================
 docker-compose-psql.yml
 docker-compose.yml
 
-# Allow template files in roles/*/templates/
+# Izinkan template .j2 di dalam roles/*/templates/ agar ter-track git
 !roles/**/templates/*.j2
 !roles/**/templates/*.yml.j2
 
+# ============================================================
+# Dockerfile (generated, bukan source)
+# ============================================================
 **/Dockerfile
 **/Dockerfile.j2
 
+# ============================================================
+# Config files sensitif yang di-generate
+# ============================================================
 **/users.xml.j2
 
-**/**.pem
-**/**.der
+# ============================================================
+# SSL / TLS certificates
+# ============================================================
+**/*.pem
+**/*.der
 
+# ============================================================
+# Debezium runtime files (bukan source code)
+# ============================================================
 **/debezium/files/kafka-config/*
 **/debezium/files/nginx/
 **/debezium/files/debezium-connectors/
 
+# ============================================================
+# Inventory files dengan IP & credentials nyata
+# ============================================================
 inventory/baremetal.ini
 inventory/production.ini
 inventory/minutex-aws.ini
 inventory/group_vars
 
+# ============================================================
+# File sensitif lokal
+# ============================================================
 .env
 port.txt
 
