@@ -4,3 +4,7 @@ keycloak_data_dir: /opt/keycloak/data
 keycloak_http_port: 8081
 
 keycloak_image: quay.io/keycloak/keycloak:25.0.2
+
+# Admin credentials — set di inventory/group_vars/iam.yml
+keycloak_admin: ""
+keycloak_admin_password: ""

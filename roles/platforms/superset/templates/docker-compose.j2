@@ -28,7 +28,7 @@ services:
       /bin/bash -c "
       superset db upgrade &&
       superset init &&
-      superset fab create-admin --username admin --firstname Admin --lastname User --email mail123@test1234.com --password secret45*! &&
+      superset fab create-admin --username admin --firstname Admin --lastname User --email mail123@test1234.com --password {{ superset_admin_password }} &&
       gunicorn --bind 0.0.0.0:8088 --workers 4 --timeout 120 'superset.app:create_app()'
       "
 
@@ -41,7 +41,7 @@ services:
     environment:
       POSTGRES_DB: superset
       POSTGRES_USER: superset
-      POSTGRES_PASSWORD: sup3rsetPw453
+      POSTGRES_PASSWORD: {{ superset_postgres_password }}
       TZ: Asia/Jakarta
     volumes:
       - ./superset_db:/var/lib/postgresql/data

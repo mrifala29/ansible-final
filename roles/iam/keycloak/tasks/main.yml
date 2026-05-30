@@ -10,10 +10,12 @@
     - "{{ keycloak_compose_dir }}"
     - "{{ keycloak_data_dir }}"
 
-- name: Copy .env to Keycloak compose directory
+- name: Render .env for Keycloak
   copy:
-    src: "{{ playbook_dir }}/../.env"
     dest: "{{ keycloak_compose_dir }}/.env"
+    content: |
+      KEYCLOAK_ADMIN={{ keycloak_admin }}
+      KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}
     owner: root
     group: root
     mode: "0600"

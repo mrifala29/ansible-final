@@ -10,10 +10,12 @@
     - "{{ minio_data_dir }}"
     - "{{ minio_compose_dir }}"
 
-- name: Copy .env to MinIO compose directory
+- name: Render .env for MinIO
   copy:
-    src: "{{ playbook_dir }}/../.env"
     dest: "{{ minio_compose_dir }}/.env"
+    content: |
+      MINIO_ROOT_USER={{ minio_root_user }}
+      MINIO_ROOT_PASSWORD={{ minio_root_password }}
     owner: root
     group: root
     mode: "0600"
