@@ -21,3 +21,5 @@ inventory/group_vars
 
 .env
 port.txt
+
+plan.md
