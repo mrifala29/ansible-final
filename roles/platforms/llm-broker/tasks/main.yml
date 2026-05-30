@@ -1,0 +1,30 @@
+- name: Ensure base directory exists
+  file:
+    path: "{{ llm_broker_base_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create LiteLLM config file (dummy / no credential)
+  copy:
+    dest: "{{ llm_broker_config_file }}"
+    content: |
+      model_list: []
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ llm_broker_base_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart llm-broker
+
+- name: Run docker compose
+  command: docker compose up -d
+  args:
+    chdir: "{{ llm_broker_base_dir }}"

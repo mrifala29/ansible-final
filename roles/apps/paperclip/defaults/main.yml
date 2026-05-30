@@ -1,0 +1,44 @@
+---
+# Paperclip Container Config
+paperclip_container_name: paperclip
+paperclip_image: ghcr.io/paperclipai/paperclip:latest
+
+# Directories
+paperclip_base_dir: /opt/paperclip
+paperclip_data_dir: "{{ paperclip_base_dir }}/data"
+
+# Port Configuration
+paperclip_port: 3102
+paperclip_internal_port: 3100
+paperclip_restart_policy: unless-stopped
+
+# Base URL (WAJIB untuk auth)
+paperclip_base_url: "http://{{ ansible_host }}:3102"
+
+# PostgreSQL Configuration
+postgres_container_name: paperclip-postgres
+postgres_image: postgres:15-alpine
+postgres_port: 5432
+postgres_db: paperclip
+postgres_user: paperclip
+postgres_password: "{{ paperclip_postgres_password }}"
+postgres_data_dir: "{{ paperclip_base_dir }}/postgres_data"
+
+# Paperclip Environment Variables
+paperclip_environment:
+  NODE_ENV: "production"
+  HOST: "0.0.0.0"
+  PORT: "{{ paperclip_internal_port }}"
+  SERVE_UI: "true"
+  PAPERCLIP_HOME: "/paperclip"
+  PAPERCLIP_INSTANCE_ID: "default"
+  PAPERCLIP_CONFIG: "/paperclip/instances/default/config.json"
+  PAPERCLIP_DEPLOYMENT_MODE: "{{ paperclip_deployment_mode }}"
+  PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
+  OPENCODE_ALLOW_ALL_MODELS: "true"
+  TZ: "Asia/Jakarta"
+  DATABASE_URL: "{{ paperclip_database_url }}"
+
+  # 🔐 AUTH (FIX UTAMA)
+  BETTER_AUTH_SECRET: "{{ paperclip_auth_secret }}"
+  BETTER_AUTH_BASE_URL: "{{ paperclip_base_url }}"

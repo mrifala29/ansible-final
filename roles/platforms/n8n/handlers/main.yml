@@ -1,0 +1,4 @@
+- name: Restart n8n
+  command: docker compose up -d
+  args:
+    chdir: "{{ n8n_base_dir }}"

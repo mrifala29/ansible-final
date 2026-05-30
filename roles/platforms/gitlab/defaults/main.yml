@@ -1,0 +1,7 @@
+gitlab_external_url: "gitlab.local"
+gitlab_port: 80
+gitlab_package: "gitlab-ce"
+gitlab_edition: "ce"
+
+gitlab_root_email: "admin@example.com"
+gitlab_root_password: "test123!!!"

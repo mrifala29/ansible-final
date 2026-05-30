@@ -1,0 +1,32 @@
+---
+- name: Ensure Keycloak directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ keycloak_compose_dir }}"
+    - "{{ keycloak_data_dir }}"
+
+- name: Copy .env to Keycloak compose directory
+  copy:
+    src: "{{ playbook_dir }}/../.env"
+    dest: "{{ keycloak_compose_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Render docker compose file for Keycloak
+  template:
+    src: docker-compose.j2
+    dest: "{{ keycloak_compose_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Start Keycloak via docker compose v2
+  community.docker.docker_compose_v2:
+    project_src: "{{ keycloak_compose_dir }}"
+    state: present

@@ -1,0 +1,8 @@
+mimir_name: mimir
+mimir_image: grafana/mimir:2.1.0
+
+mimir_data_dir: /opt/mimir/data
+mimir_compose_dir: /opt/mimir
+mimir_config_dir: /opt/mimir/config
+
+mimir_http_port: 9500

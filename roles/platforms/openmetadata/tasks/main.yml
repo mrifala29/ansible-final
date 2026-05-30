@@ -1,0 +1,78 @@
+- name: Create openmetadata directory
+  file:
+    path: "{{ openmetadata_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create required subdirectories
+  file:
+    path: "{{ openmetadata_dir }}/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - data/mysql
+    - data/elasticsearch
+    - conf/keys
+
+# 🔥 FIX PERMISSION ES (KRUSIAL)
+- name: Fix Elasticsearch data permission
+  file:
+    path: "{{ openmetadata_dir }}/data/elasticsearch"
+    state: directory
+    owner: 1000
+    group: 1000
+    recurse: yes
+
+# 🔥 FIX KERNEL PARAM
+- name: Set vm.max_map_count
+  sysctl:
+    name: vm.max_map_count
+    value: "262144"
+    state: present
+    reload: yes
+
+- name: Copy OpenMetadata config
+  copy:
+    src: conf/
+    dest: "{{ openmetadata_dir }}/conf/"
+    mode: "0644"
+
+- name: Deploy docker-compose
+  template:
+    src: docker-compose.j2
+    dest: "{{ openmetadata_dir }}/docker-compose.yml"
+
+# 🔥 START MYSQL & ES DULU (PISAH)
+- name: Start MySQL and Elasticsearch
+  community.docker.docker_compose_v2:
+    project_src: "{{ openmetadata_dir }}"
+    services:
+      - mysql
+      - elasticsearch
+    state: present
+
+# 🔥 WAIT MYSQL
+- name: Wait for MySQL ready
+  shell: docker exec openmetadata_mysql mysqladmin ping -h localhost --silent
+  register: mysql_ready
+  retries: 10
+  delay: 5
+  until: mysql_ready.rc == 0
+
+# 🔥 WAIT ELASTICSEARCH
+- name: Wait for Elasticsearch ready
+  uri:
+    url: http://localhost:9201
+    status_code: 200
+  register: es_ready
+  retries: 10
+  delay: 5
+  until: es_ready.status == 200
+
+# 🔥 START OPENMETADATA
+- name: Start OpenMetadata server
+  community.docker.docker_compose_v2:
+    project_src: "{{ openmetadata_dir }}"
+    services:
+      - openmetadata-server
+    state: present

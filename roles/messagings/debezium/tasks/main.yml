@@ -1,0 +1,47 @@
+- name: Create base directory
+  file:
+    path: "{{ debezium_base_dir }}"
+    state: directory
+    mode: '0755'
+
+
+- name: Copy Kafka config
+  copy:
+    src: kafka-config/
+    dest: "{{ debezium_base_dir }}/kafka-config/"
+    mode: '0644'
+
+- name: Copy Debezium connectors
+  copy:
+    src: debezium-connectors/
+    dest: "{{ debezium_base_dir }}/debezium-connectors/"
+    mode: '0644'
+
+- name: Copy nginx config
+  copy:
+    src: nginx/
+    dest: "{{ debezium_base_dir }}/nginx/"
+    mode: '0644'
+
+
+
+- name: Deploy docker-compose.yml
+  template:
+    src: docker-compose.yml
+    dest: "{{ debezium_base_dir }}/docker-compose.yml"
+  notify: restart debezium
+
+- name: Deploy docker-compose-psql.yml
+  template:
+    src: docker-compose-psql.yml
+    dest: "{{ debezium_base_dir }}/docker-compose-psql.yml"
+  when: enable_postgres
+
+
+
+- name: Start Debezium stack (async)
+  command: docker compose up -d
+  args:
+    chdir: "{{ debezium_base_dir }}"
+  async: 600
+  poll: 0

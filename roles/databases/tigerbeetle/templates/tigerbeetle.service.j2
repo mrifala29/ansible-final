@@ -1,0 +1,15 @@
+[Unit]
+Description=TigerBeetle
+After=network.target
+
+[Service]
+User={{ tigerbeetle_user }}
+Group={{ tigerbeetle_group }}
+ExecStart={{ tigerbeetle_install_dir }}/tigerbeetle start \
+  --addresses=127.0.0.1:{{ tigerbeetle_port }} \
+  {{ tigerbeetle_data_dir }}/data.tigerbeetle
+Restart=always
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target

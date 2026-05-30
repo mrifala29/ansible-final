@@ -1,0 +1,32 @@
+---
+- name: Create OpenTelemetry directory
+  ansible.builtin.file:
+    path: "{{ opentelemetry_install_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create OpenTelemetry config
+  ansible.builtin.template:
+    src: opentelemetry-config.yml.j2
+    dest: "{{ opentelemetry_install_dir }}/opentelemetry-config.yml"
+    mode: "0644"
+  notify: restart opentelemetry
+
+- name: Create docker compose
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ opentelemetry_install_dir }}/docker-compose.yml"
+    mode: "0644"
+  notify: restart opentelemetry
+
+- name: Stop existing OpenTelemetry containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ opentelemetry_install_dir }}"
+    state: absent
+  ignore_errors: true
+
+- name: Run OpenTelemetry
+  community.docker.docker_compose_v2:
+    project_src: "{{ opentelemetry_install_dir }}"
+    state: present
+    recreate: always

@@ -1,0 +1,10 @@
+llm_broker_base_dir: /opt/llm-broker
+
+llm_broker_port_host: 4100
+llm_broker_port_container: 4000
+
+llm_broker_image: ghcr.io/berriai/litellm:main
+
+llm_broker_container_name: llm-broker
+
+llm_broker_config_file: "{{ llm_broker_base_dir }}/config.yaml"

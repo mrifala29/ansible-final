@@ -1,0 +1,5 @@
+---
+- name: restart opentelemetry
+  community.docker.docker_compose_v2:
+    project_src: "{{ opentelemetry_install_dir }}"
+    state: restarted

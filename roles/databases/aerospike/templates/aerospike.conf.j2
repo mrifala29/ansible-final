@@ -1,0 +1,46 @@
+service {
+    user root
+    group root
+    paxos-single-replica-limit 1
+    pidfile /var/run/aerospike/asd.pid
+    service-threads 4
+    transaction-queues 4
+    transaction-threads-per-queue 4
+    proto-fd-max 15000
+}
+
+logging {
+    file /var/log/aerospike/aerospike.log {
+        context any info
+    }
+}
+
+network {
+    service {
+        address any
+        port {{ aerospike_service_port }}
+    }
+
+    heartbeat {
+        mode mesh
+        port {{ aerospike_heartbeat_port }}
+        mesh-seed-address-port {{ ansible_host }}:{{ aerospike_heartbeat_port }}
+        interval 150
+        timeout 10
+    }
+
+    fabric {
+        port {{ aerospike_fabric_port }}
+    }
+
+    info {
+        port {{ aerospike_info_port }}
+    }
+}
+
+namespace test {
+    replication-factor 2
+    memory-size 4G
+    default-ttl 30d
+    storage-engine memory
+}

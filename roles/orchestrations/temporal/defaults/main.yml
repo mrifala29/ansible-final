@@ -1,0 +1,19 @@
+# Temporal server image
+temporal_image: temporalio/auto-setup:1.24.2
+temporal_ui_image: temporalio/ui:2.26.2
+temporal_container_name: temporal
+temporal_ui_container_name: temporal-ui
+
+# Directories
+temporal_base_dir: /opt/temporal
+
+# Ports (tidak tabrakan dengan port.txt yang ada)
+temporal_grpc_port: 7233        # temporal frontend gRPC
+temporal_ui_port: 8090          # temporal Web UI
+
+# Database backend (hardcoded di docker-compose.yml untuk keamanan)
+temporal_db_host: "{{ ansible_host }}"
+
+temporal_visibility_db_name: temporal_visibility
+
+temporal_restart_policy: unless-stopped

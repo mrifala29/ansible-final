@@ -1,0 +1,61 @@
+---
+- name: Ensure apt cache is up-to-date
+  apt:
+    update_cache: yes
+
+- name: Install prerequisites
+  apt:
+    name:
+      - curl
+      - apt-transport-https
+      - gnupg
+    state: present
+
+- name: Add Elasticsearch GPG key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Add Elasticsearch repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+    state: present
+    filename: "elastic-8.x"
+
+- name: Install Kibana
+  apt:
+    name: "{{ 'kibana=' + kibana_version if kibana_version else 'kibana' }}"
+    state: present
+
+- name: Deploy kibana.yml from template
+  template:
+    src: kibana.service.j2
+    dest: /etc/kibana/kibana.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart kibana
+
+- name: Wait for Elasticsearch to be available
+  uri:
+    url: "{{ elasticsearch_host }}"
+    user: "{{ kibana_user }}"
+    password: "{{ kibana_password }}"
+    status_code: 200
+  register: es_status
+  retries: 10
+  delay: 5
+  until: es_status.status == 200
+
+- name: Enable and start Kibana service
+  systemd:
+    name: kibana
+    enabled: yes
+    state: started
+
+- name: Ensure Kibana port is open in ufw (if using ufw)
+  ufw:
+    rule: allow
+    port: "{{ kibana_port }}"
+    proto: tcp
+  when: ansible_facts['os_family'] == "Debian"

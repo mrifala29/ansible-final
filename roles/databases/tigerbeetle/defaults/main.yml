@@ -1,0 +1,13 @@
+tigerbeetle_version: "0.16.11"
+tigerbeetle_arch: "x86_64"
+tigerbeetle_libc: "gnu"
+
+tigerbeetle_user: tigerbeetle
+tigerbeetle_group: tigerbeetle
+
+tigerbeetle_install_dir: /opt/tigerbeetle
+tigerbeetle_data_dir: /var/lib/tigerbeetle
+
+tigerbeetle_port: 3000
+tigerbeetle_cluster_id: 0
+tigerbeetle_replica_id: 0

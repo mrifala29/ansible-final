@@ -1,0 +1,4 @@
+- name: Restart Qdrant
+  command: docker compose up -d
+  args:
+    chdir: "{{ qdrant_base_dir }}"

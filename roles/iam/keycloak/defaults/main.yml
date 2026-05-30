@@ -1,0 +1,6 @@
+keycloak_compose_dir: /opt/keycloak
+keycloak_data_dir: /opt/keycloak/data
+
+keycloak_http_port: 8081
+
+keycloak_image: quay.io/keycloak/keycloak:25.0.2

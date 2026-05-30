@@ -1,0 +1,49 @@
+- name: Ensure app directory exists
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    mode: '0755'
+
+# Copy file satuan
+- name: Copy application files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ app_dir }}/{{ item }}"
+  loop:
+    - Dockerfile
+    - go.mod
+    - go.sum
+    - main.go
+    - logo_dana.png
+    - logo_dana.jpg
+  notify: Restart qr app
+
+# Copy folder
+- name: Copy directories
+  copy:
+    src: "{{ item }}"
+    dest: "{{ app_dir }}/"
+  loop:
+    - fonts
+    - public
+  notify: Restart qr app
+
+# Template docker-compose
+- name: Template docker-compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_dir }}/docker-compose.yml"
+  notify: Restart qr app
+
+# Ensure public folder (safety)
+- name: Ensure public directory exists
+  file:
+    path: "{{ app_dir }}/public"
+    state: directory
+    mode: '0755'
+
+# First run (idempotent-ish)
+- name: Run docker compose
+  command: docker compose up -d --build
+  args:
+    chdir: "{{ app_dir }}"

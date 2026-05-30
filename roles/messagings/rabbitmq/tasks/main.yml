@@ -1,0 +1,11 @@
+- name: Install RabbitMQ
+  apt:
+    name: rabbitmq-server
+    state: present
+    update_cache: true
+
+- name: Enable RabbitMQ service
+  service:
+    name: rabbitmq-server
+    state: started
+    enabled: true

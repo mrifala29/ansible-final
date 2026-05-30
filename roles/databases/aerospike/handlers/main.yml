@@ -1,0 +1,4 @@
+- name: aerospike-restart
+  command: docker compose restart {{ aerospike_container_name }}
+  args:
+    chdir: "{{ aerospike_base_dir }}"

@@ -1,0 +1,8 @@
+server {
+    listen {{ nginx_listen_port }};
+    server_name _;
+
+    location / {
+        return 200 "Nginx running on port {{ nginx_listen_port }}\n";
+    }
+}

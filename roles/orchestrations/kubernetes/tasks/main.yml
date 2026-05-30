@@ -1,0 +1,6 @@
+---
+- import_tasks: prereq.yml
+- import_tasks: container-runtime.yml
+- import_tasks: kube-packages.yml
+- import_tasks: control-plane.yml
+- import_tasks: worker.yml

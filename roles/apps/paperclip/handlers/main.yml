@@ -1,0 +1,5 @@
+---
+- name: Restart paperclip
+  command: docker compose up -d --force-recreate
+  args:
+    chdir: "{{ paperclip_base_dir }}"

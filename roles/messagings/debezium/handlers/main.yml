@@ -1,0 +1,4 @@
+- name: restart debezium
+  command: docker compose up -d
+  args:
+    chdir: "{{ debezium_base_dir }}"

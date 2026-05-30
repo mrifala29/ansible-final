@@ -1,0 +1,10 @@
+# Kubernetes & KIND versions
+kubectl_version: "v1.30.0"
+kind_version: "v0.22.0"
+
+# Cluster config
+kind_cluster_name: "dev"
+kind_kubeconfig: "/root/.kube/config"
+
+# Kind node image (optional tapi bagus)
+kind_node_image: "kindest/node:v1.30.0"

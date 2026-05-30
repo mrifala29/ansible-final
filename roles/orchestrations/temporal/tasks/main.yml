@@ -1,0 +1,68 @@
+---
+- name: Create Temporal base directory
+  file:
+    path: "{{ temporal_base_dir }}"
+    state: directory
+    mode: '0755'
+  tags: temporal
+
+- name: Deploy Temporal docker-compose
+  template:
+    src: docker-compose.yml
+    dest: "{{ temporal_base_dir }}/docker-compose.yml"
+    mode: '0644'
+  notify: Restart Temporal
+  tags: temporal
+
+- name: Start Temporal stack
+  command: docker compose up -d
+  args:
+    chdir: "{{ temporal_base_dir }}"
+  tags: temporal
+
+- name: Wait for Temporal container to be ready (give it time to start)
+  pause:
+    seconds: 30
+  tags: temporal
+
+- name: Check temporal container status
+  command: docker compose ps
+  args:
+    chdir: "{{ temporal_base_dir }}"
+  register: temporal_ps
+  tags: temporal
+
+- name: Display temporal container status
+  debug:
+    msg: "{{ temporal_ps.stdout }}"
+  tags: temporal
+
+- name: Capture temporal container logs
+  shell: docker compose logs temporal --tail 10 2>&1
+  args:
+    chdir: "{{ temporal_base_dir }}"
+  register: temporal_logs
+  tags: temporal
+
+- name: Display temporal logs
+  debug:
+    msg: "{{ temporal_logs.stdout }}"
+  tags: temporal
+
+- name: Wait for Temporal gRPC to be ready
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ temporal_grpc_port }}"
+    delay: 5
+    timeout: 30
+    state: started
+  ignore_errors: yes
+  tags: temporal
+
+- name: Wait for Temporal UI to be ready
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ temporal_ui_port }}"
+    delay: 5
+    timeout: 120
+  tags: temporal

@@ -1,0 +1,6 @@
+---
+- name: Restart loki
+  community.docker.docker_compose_v2:
+    project_src: "{{ loki_compose_dir }}"
+    state: present
+    recreate: always

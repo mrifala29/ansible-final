@@ -1,0 +1,35 @@
+---
+- name: Ensure mimir directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ mimir_data_dir }}"
+    - "{{ mimir_compose_dir }}"
+    - "{{ mimir_config_dir }}"
+
+- name: Render mimir config
+  template:
+    src: mimir.yaml.j2
+    dest: "{{ mimir_config_dir }}/mimir.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart mimir
+
+- name: Render docker compose file for mimir
+  template:
+    src: docker-compose.j2
+    dest: "{{ mimir_compose_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart mimir
+
+- name: Start mimir via docker compose v2
+  community.docker.docker_compose_v2:
+    project_src: "{{ mimir_compose_dir }}"
+    state: present

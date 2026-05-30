@@ -1,0 +1,52 @@
+---
+- name: Install dependencies
+  apt:
+    name:
+      - curl
+      - ca-certificates
+      - gnupg
+    state: present
+    update_cache: yes
+
+- name: Download GitLab GPG key
+  command: >
+    curl -4 -fsSL https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
+    -o /usr/share/keyrings/gitlab_gitlab-ce-archive-keyring.asc
+  args:
+    creates: /usr/share/keyrings/gitlab_gitlab-ce-archive-keyring.asc
+
+- name: Convert GPG key
+  command: >
+    gpg --dearmor
+    -o /usr/share/keyrings/gitlab_gitlab-ce-archive-keyring.gpg
+    /usr/share/keyrings/gitlab_gitlab-ce-archive-keyring.asc
+  args:
+    creates: /usr/share/keyrings/gitlab_gitlab-ce-archive-keyring.gpg
+
+- name: Add GitLab repository (force jammy for Ubuntu 24.04)
+  copy:
+    dest: /etc/apt/sources.list.d/gitlab_gitlab-ce.list
+    content: |
+      deb [signed-by=/usr/share/keyrings/gitlab_gitlab-ce-archive-keyring.gpg] https://packages.gitlab.com/gitlab/gitlab-ce/ubuntu jammy main
+    mode: '0644'
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install GitLab CE
+  apt:
+    name: gitlab-ce
+    state: present
+
+- name: Ensure /etc/gitlab exists
+  file:
+    path: /etc/gitlab
+    state: directory
+    mode: '0755'
+
+- name: Deploy gitlab.rb
+  template:
+    src: gitlab.rb.j2
+    dest: /etc/gitlab/gitlab.rb
+  notify: Reconfigure GitLab

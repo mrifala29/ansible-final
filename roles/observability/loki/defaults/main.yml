@@ -1,0 +1,8 @@
+loki_name: loki
+loki_image: grafana/loki:2.9.4
+
+loki_http_port: 3100
+
+loki_data_dir: /opt/loki/data
+loki_compose_dir: /opt/loki
+loki_config_dir: /opt/loki/config

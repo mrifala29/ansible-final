@@ -1,0 +1,4 @@
+- name: restart superset
+  community.docker.docker_compose_v2:
+    project_src: "{{ superset_dir }}"
+    state: restarted

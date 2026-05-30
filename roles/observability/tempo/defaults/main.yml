@@ -1,0 +1,6 @@
+service_name: tempo
+service_data_dir: /opt/tempo/data
+service_compose_dir: /opt/tempo
+service_http_port: 3200
+service_grpc_port: 4317
+service_image: grafana/tempo:1.9.0

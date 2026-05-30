@@ -1,0 +1,16 @@
+# Prometheus configuration
+prometheus_version: "2.49.1"
+prometheus_port: 9091
+prometheus_user: "prometheus"
+prometheus_config_path: "/etc/prometheus/prometheus.yml"
+prometheus_data_path: "/var/lib/prometheus"
+
+# Scrape configuration
+prometheus_scrape_interval: "5s"
+
+# Targets
+prometheus_targets:
+  prometheus:
+    - "localhost:{{ prometheus_port }}"
+  node_exporter:
+    - "localhost:9100"

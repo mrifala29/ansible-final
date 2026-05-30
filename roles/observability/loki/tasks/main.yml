@@ -1,0 +1,46 @@
+- name: Ensure loki data directory exists (must be writable by Loki UID 10001)
+  file:
+    path: "{{ loki_data_dir }}"
+    state: directory
+    owner: 10001
+    group: 10001
+    mode: "0755"
+
+- name: Ensure loki compose directory exists
+  file:
+    path: "{{ loki_compose_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure loki config directory exists
+  file:
+    path: "{{ loki_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Render loki configuration file
+  template:
+    src: loki.yml.j2
+    dest: "{{ loki_config_dir }}/loki.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart loki
+
+- name: Render docker compose file for loki
+  template:
+    src: docker-compose.j2
+    dest: "{{ loki_compose_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart loki
+
+- name: Deploy Loki via Docker Compose v2
+  community.docker.docker_compose_v2:
+    project_src: "{{ loki_compose_dir }}"
+    state: present

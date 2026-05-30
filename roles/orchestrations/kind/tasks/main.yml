@@ -1,0 +1,38 @@
+---
+- name: Ensure dependencies are installed
+  apt:
+    name:
+      - curl
+      - ca-certificates
+    state: present
+    update_cache: true
+
+- name: Install kubectl
+  get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+
+- name: Install kind
+  get_url:
+    url: "https://kind.sigs.k8s.io/dl/{{ kind_version }}/kind-linux-amd64"
+    dest: /usr/local/bin/kind
+    mode: '0755'
+
+- name: Ensure kube config directory exists
+  file:
+    path: "{{ kind_kubeconfig | dirname }}"
+    state: directory
+    mode: '0700'
+
+- name: Check if kind cluster already exists
+  command: kind get clusters
+  register: kind_clusters
+  changed_when: false
+
+- name: Create kind cluster
+  command: >
+    kind create cluster
+    --name {{ kind_cluster_name }}
+    --image {{ kind_node_image }}
+  when: kind_cluster_name not in kind_clusters.stdout

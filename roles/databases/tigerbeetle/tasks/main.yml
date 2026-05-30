@@ -1,0 +1,81 @@
+---
+- name: Create tigerbeetle group
+  group:
+    name: "{{ tigerbeetle_group }}"
+    system: true
+
+- name: Create tigerbeetle user
+  user:
+    name: "{{ tigerbeetle_user }}"
+    group: "{{ tigerbeetle_group }}"
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+
+- name: Create install directory
+  file:
+    path: "{{ tigerbeetle_install_dir }}"
+    state: directory
+    owner: "{{ tigerbeetle_user }}"
+    group: "{{ tigerbeetle_group }}"
+    mode: "0755"
+
+- name: Create data directory
+  file:
+    path: "{{ tigerbeetle_data_dir }}"
+    state: directory
+    owner: "{{ tigerbeetle_user }}"
+    group: "{{ tigerbeetle_group }}"
+    mode: "0755"
+
+- name: Download TigerBeetle binary
+  get_url:
+    url: "https://linux.tigerbeetle.com"
+    dest: "/tmp/tigerbeetle.zip"
+    mode: "0644"
+
+- name: Extract TigerBeetle ZIP
+  unarchive:
+    src: /tmp/tigerbeetle.zip
+    dest: "{{ tigerbeetle_install_dir }}"
+    remote_src: true
+    creates: "{{ tigerbeetle_install_dir }}/tigerbeetle"
+
+- name: Set binary permission
+  file:
+    path: "{{ tigerbeetle_install_dir }}/tigerbeetle"
+    owner: "{{ tigerbeetle_user }}"
+    group: "{{ tigerbeetle_group }}"
+    mode: "0755"
+
+- name: Format TigerBeetle data file if not exists
+  command: >
+    {{ tigerbeetle_install_dir }}/tigerbeetle format
+    --replica=0 --replica-count=1
+    {{ tigerbeetle_data_dir }}/data.tigerbeetle
+  args:
+    creates: "{{ tigerbeetle_data_dir }}/data.tigerbeetle"
+  become: yes
+  become_user: "{{ tigerbeetle_user }}"
+
+- name: Install systemd service
+  template:
+    src: tigerbeetle.service.j2
+    dest: /etc/systemd/system/tigerbeetle.service
+  notify:
+    - Reload systemd
+    - Restart tigerbeetle
+
+- name: Ensure TigerBeetle data directory exists
+  file:
+    path: "{{ tigerbeetle_data_dir }}"
+    state: directory
+    owner: "{{ tigerbeetle_user }}"
+    group: "{{ tigerbeetle_group }}"
+    mode: "0755"
+
+- name: Enable and start TigerBeetle
+  systemd:
+    name: tigerbeetle
+    enabled: true
+    state: started

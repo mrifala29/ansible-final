@@ -1,0 +1,17 @@
+aerospike_container_name: aerospike
+aerospike_image: aerospike/aerospike-server:8.0.0.0
+
+aerospike_base_dir: /opt/aerospike
+aerospike_data_dir: "{{ aerospike_base_dir }}/data"
+aerospike_log_dir: "{{ aerospike_base_dir }}/logs"
+
+aerospike_service_port: 3000
+aerospike_heartbeat_port: 3002
+aerospike_fabric_port: 3001
+aerospike_info_port: 3003
+
+aerospike_ports:
+  - "3000:3000"
+  - "3001:3001"
+  - "3002:3002"
+  - "3003:3003"

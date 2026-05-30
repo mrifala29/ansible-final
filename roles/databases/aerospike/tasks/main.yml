@@ -1,0 +1,28 @@
+- name: Create Aerospike directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ aerospike_base_dir }}"
+    - "{{ aerospike_data_dir }}"
+    - "{{ aerospike_log_dir }}"
+
+- name: Deploy aerospike config
+  template:
+    src: aerospike.conf.j2
+    dest: "{{ aerospike_base_dir }}/aerospike.conf"
+    mode: "0644"
+  notify: aerospike-restart
+
+- name: Deploy docker-compose file
+  template:
+    src: docker-compose.j2
+    dest: "{{ aerospike_base_dir }}/docker-compose.yml"
+    mode: "0644"
+  notify: aerospike-restart
+
+- name: Start Aerospike via docker compose
+  command: docker compose up -d
+  args:
+    chdir: "{{ aerospike_base_dir }}"

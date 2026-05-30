@@ -1,0 +1,16 @@
+- name: Create Scylla directory
+  file:
+    path: /opt/scylla
+    state: directory
+    mode: '0755'
+
+- name: Deploy docker-compose file
+  template:
+    src: docker-compose.j2
+    dest: /opt/scylla/docker-compose.yml
+  notify: Restart Scylla
+
+- name: Run docker-compose
+  command: docker-compose up -d
+  args:
+    chdir: /opt/scylla

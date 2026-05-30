@@ -1,0 +1,13 @@
+n8n_container_name: n8n
+n8n_image: n8nio/n8n:latest
+
+n8n_base_dir: /opt/n8n
+n8n_data_dir: "{{ n8n_base_dir }}/data"
+
+n8n_ports:
+  - "5679:5679"
+
+n8n_restart_policy: unless-stopped
+
+n8n_environment:
+  GENERIC_TIMEZONE: "Asia/Jakarta"

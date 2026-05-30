@@ -1,0 +1,86 @@
+---
+- name: Wait for apt lock file to be released
+  shell: while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done
+  tags: redis_install
+
+- name: Update apt cache with retry
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  register: apt_cache_update
+  until: apt_cache_update is succeeded
+  retries: 3
+  delay: 10
+  tags: redis_install
+
+- name: Install Redis server package
+  apt:
+    name: redis-server
+    state: present
+  tags: redis_install
+
+- name: Create redis log directory
+  file:
+    path: /var/log/redis
+    state: directory
+    owner: redis
+    group: redis
+    mode: '0755'
+  tags: redis_config
+
+- name: Copy Redis configuration
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+    owner: redis
+    group: redis
+    mode: '0644'
+    backup: yes
+  notify: restart redis
+  tags: redis_config
+
+- name: Ensure Redis is started and enabled
+  service:
+    name: redis-server
+    state: started
+    enabled: yes
+  tags: redis_service
+
+- name: Wait for Redis service to be running
+  pause:
+    seconds: 3
+  tags: redis_service
+
+- name: Wait for Redis to be ready on localhost
+  wait_for:
+    host: "127.0.0.1"
+    port: "{{ redis_port }}"
+    delay: 1
+    timeout: 15
+  tags: redis_service
+
+- name: Verify Redis is responding
+  command: redis-cli -p {{ redis_port }} -a {{ redis_requirepass }} PING
+  register: redis_ping_result
+  until: redis_ping_result.stdout is defined and redis_ping_result.stdout == 'PONG'
+  retries: 5
+  delay: 2
+  changed_when: false
+  ignore_errors: yes
+  tags: redis_verify
+
+- name: Display Redis status
+  debug:
+    msg: "Redis is running on port {{ redis_port }} - Response: {{ redis_ping_result.stdout | default('no response') }}"
+  tags: redis_verify
+
+- name: Check Redis service status
+  command: systemctl status redis-server
+  register: redis_status
+  changed_when: false
+  tags: redis_verify
+
+- name: Show service status
+  debug:
+    msg: "{{ redis_status.stdout }}"
+  tags: redis_verify

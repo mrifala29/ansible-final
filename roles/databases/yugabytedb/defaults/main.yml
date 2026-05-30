@@ -1,0 +1,16 @@
+yugabytedb_version: "2.21.0.0-b545"
+
+yugabytedb_base_dir: "/opt/yugabytedb"
+yugabytedb_data_dir: "/opt/yugabytedb/data"
+yugabytedb_log_dir: "/opt/yugabytedb/logs"
+yugabytedb_conf_dir: "/opt/yugabytedb/conf"
+
+yugabytedb_master_port: 7000
+yugabytedb_tserver_port: 9000
+yugabytedb_yql_port: 9042
+yugabytedb_ysql_port: 5433
+
+yugabytedb_cluster_name: "yb-cluster"
+
+docker_compose_path: "/opt/yugabytedb/docker-compose.yml"
+docker_compose_version: "v2.25.0"

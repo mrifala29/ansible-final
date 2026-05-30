@@ -1,0 +1,23 @@
+- name: Create qdrant base directory
+  file:
+    path: "{{ qdrant_base_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create qdrant data directory
+  file:
+    path: "{{ qdrant_data_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Generate docker-compose for qdrant
+  template:
+    src: docker-compose.j2
+    dest: "{{ qdrant_base_dir }}/docker-compose.yml"
+    mode: "0644"
+  notify: Restart Qdrant
+
+- name: Start Qdrant container
+  command: docker compose up -d
+  args:
+    chdir: "{{ qdrant_base_dir }}"

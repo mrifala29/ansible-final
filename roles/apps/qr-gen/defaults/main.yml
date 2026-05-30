@@ -1,0 +1,3 @@
+app_name: qr-generator
+app_dir: /opt/qr-gen
+app_port: 3000

@@ -1,0 +1,10 @@
+scylla_image: "scylladb/scylla:5.4"
+scylla_container_name: "scylla"
+
+scylla_data_dir: "/var/lib/scylla"
+
+scylla_memory: "1G"
+scylla_smp: 1
+
+scylla_ports:
+  - "9042:9042"

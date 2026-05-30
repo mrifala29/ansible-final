@@ -1,0 +1,16 @@
+---
+- name: Add k6 GPG key
+  apt_key:
+    url: https://dl.k6.io/key.gpg
+    state: present
+
+- name: Add k6 repository
+  apt_repository:
+    repo: deb https://dl.k6.io/deb stable main
+    state: present
+
+- name: Install k6
+  apt:
+    name: k6
+    state: present
+    update_cache: yes

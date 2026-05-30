@@ -1,0 +1,10 @@
+---
+- name: Restart redis
+  service:
+    name: redis-server
+    state: restarted
+  listen: "restart redis"
+
+- name: Reload redis
+  command: redis-cli CONFIG REWRITE
+  listen: "reload redis"

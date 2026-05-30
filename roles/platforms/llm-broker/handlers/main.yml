@@ -1,0 +1,4 @@
+- name: Restart llm-broker
+  shell: docker compose down && docker compose up -d
+  args:
+    chdir: "{{ llm_broker_base_dir }}"

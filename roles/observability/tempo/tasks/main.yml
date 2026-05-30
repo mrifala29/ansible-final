@@ -1,0 +1,85 @@
+---
+- name: Check if Tempo data directory exists
+  ansible.builtin.stat:
+    path: "{{ service_data_dir }}"
+  register: stat_data_dir
+
+- name: Remove {{ service_data_dir }} if it is a file
+  ansible.builtin.file:
+    path: "{{ service_data_dir }}"
+    state: absent
+  when: stat_data_dir.stat.exists and not stat_data_dir.stat.isdir
+  become: yes
+
+- name: Ensure {{ service_data_dir }} is a directory
+  ansible.builtin.file:
+    path: "{{ service_data_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: yes
+
+- name: Check if Tempo compose directory exists
+  ansible.builtin.stat:
+    path: "{{ service_compose_dir }}"
+  register: stat_compose_dir
+
+- name: Remove {{ service_compose_dir }} if it is a file
+  ansible.builtin.file:
+    path: "{{ service_compose_dir }}"
+    state: absent
+  when: stat_compose_dir.stat.exists and not stat_compose_dir.stat.isdir
+  become: yes
+
+- name: Ensure {{ service_compose_dir }} is a directory
+  ansible.builtin.file:
+    path: "{{ service_compose_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: yes
+
+
+# 🔥 FIX UTAMA DI SINI
+- name: Check if tempo.yaml exists
+  ansible.builtin.stat:
+    path: "{{ service_compose_dir }}/tempo.yaml"
+  register: stat_tempo_yaml
+
+- name: Remove tempo.yaml if it is a directory
+  ansible.builtin.file:
+    path: "{{ service_compose_dir }}/tempo.yaml"
+    state: absent
+  when: stat_tempo_yaml.stat.exists and stat_tempo_yaml.stat.isdir
+  become: yes
+
+- name: Render tempo config
+  ansible.builtin.template:
+    src: tempo.yaml.j2
+    dest: "{{ service_compose_dir }}/tempo.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Restart {{ service_name }} container
+  become: yes
+
+
+- name: Render docker compose file for {{ service_name }}
+  ansible.builtin.template:
+    src: docker-compose.j2
+    dest: "{{ service_compose_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Restart {{ service_name }} container
+  become: yes
+
+- name: Start {{ service_name }} via docker compose v2
+  community.docker.docker_compose_v2:
+    project_src: "{{ service_compose_dir }}"
+    state: present
+  become: yes

@@ -1,0 +1,24 @@
+---
+redis_port: 6379
+redis_bind: "0.0.0.0"
+redis_databases: 16
+redis_loglevel: "notice"
+redis_logfile: "/var/log/redis/redis-server.log"
+redis_maxmemory: "256mb"
+redis_maxmemory_policy: "allkeys-lru"
+redis_appendonly: "no"
+redis_appendfilename: "appendonly.aof"
+redis_save_enabled: true
+redis_save_intervals:
+  - "900 1"
+  - "300 10"
+  - "60 10000"
+redis_timeout: 0
+redis_tcp_keepalive: 300
+redis_tcp_backlog: 511
+
+# Redis Auth
+redis_username: "Linkit360"
+redis_password: "L1nkit360"
+redis_requirepass: "L1nkit360"
+

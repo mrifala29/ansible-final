@@ -1,0 +1,64 @@
+---
+- name: Create paperclip base directory
+  file:
+    path: "{{ paperclip_base_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create paperclip data directory
+  file:
+    path: "{{ paperclip_data_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create PostgreSQL data directory
+  file:
+    path: "{{ postgres_data_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Pull Paperclip Docker image
+  command: docker pull {{ paperclip_image }}
+  register: docker_pull_result
+  changed_when: "'Downloaded newer image' in docker_pull_result.stdout or 'Pull complete' in docker_pull_result.stdout"
+  async: 900
+  poll: 30
+
+- name: Pull PostgreSQL Docker image
+  command: docker pull {{ postgres_image }}
+  register: docker_pull_postgres
+  changed_when: "'Downloaded newer image' in docker_pull_postgres.stdout or 'Pull complete' in docker_pull_postgres.stdout"
+  async: 900
+  poll: 30
+
+- name: Generate docker-compose for paperclip
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ paperclip_base_dir }}/docker-compose.yml"
+    mode: "0644"
+  notify: Restart paperclip
+
+- name: Fix permission for paperclip data dir
+  file:
+    path: "{{ paperclip_data_dir }}"
+    state: directory
+    recurse: yes
+    owner: "1000"
+    group: "1000"
+
+- name: Start paperclip containers (postgres + app)
+  command: docker compose up -d
+  args:
+    chdir: "{{ paperclip_base_dir }}"
+  register: compose_up
+  changed_when: "'Started' in compose_up.stdout or 'Created' in compose_up.stdout"
+
+- name: Wait for Paperclip to be ready
+  uri:
+    url: "http://localhost:{{ paperclip_port }}"
+    method: GET
+  register: result
+  until: result.status == 200
+  retries: 5
+  delay: 2
+  failed_when: false

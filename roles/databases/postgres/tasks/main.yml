@@ -1,0 +1,18 @@
+- name: Add PostgreSQL repo
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt noble-pgdg main"
+    state: present
+
+- name: Add PostgreSQL GPG key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install PostgreSQL 18
+  apt:
+    name: postgresql-18
+    state: present

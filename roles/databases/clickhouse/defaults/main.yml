@@ -1,0 +1,10 @@
+clickhouse_image: clickhouse/clickhouse-server:latest
+
+clickhouse_container_name: clickhouse
+
+clickhouse_ports:
+  - "8123:8123"
+  - "9123:9000"
+
+clickhouse_data_dir: /opt/clickhouse/data
+clickhouse_config_dir: /opt/clickhouse/config

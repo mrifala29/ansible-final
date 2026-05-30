@@ -1,0 +1,11 @@
+qdrant_container_name: qdrant
+qdrant_image: qdrant/qdrant:latest
+
+qdrant_base_dir: /opt/qdrant
+qdrant_data_dir: "{{ qdrant_base_dir }}/data"
+
+qdrant_ports:
+  - "6332:6332"
+  - "6335:6335"
+
+qdrant_restart_policy: unless-stopped

@@ -1,0 +1,4 @@
+- name: Allow control plane to run workloads (single node)
+  command: >
+    kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+  ignore_errors: true

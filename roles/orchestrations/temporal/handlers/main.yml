@@ -1,0 +1,5 @@
+---
+- name: Restart Temporal
+  command: docker compose up -d --force-recreate
+  args:
+    chdir: "{{ temporal_base_dir }}"

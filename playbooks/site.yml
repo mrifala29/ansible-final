@@ -1,0 +1,176 @@
+---
+# BASE LAYER
+- name: Base system setup
+  hosts: all
+  become: true
+  roles:
+    - role: base/common
+      tags: [base, common]
+
+    - role: base/docker
+      tags: [base, docker]
+
+
+# NETWORK / EDGE
+- name: Network components
+  hosts: networks
+  become: true
+  roles:
+    - role: networks/nginx
+      tags: [networks, nginx]
+
+
+# PLATFORM
+- name: Platform services
+  hosts: platforms
+  become: true
+  roles:
+    - role: platforms/gitlab
+      tags: [platforms, gitlab]
+
+    - role: platforms/n8n
+      tags: [platforms, n8n]
+
+    - role: platforms/openmetadata
+      tags: [platforms, openmetadata]
+
+    - role: platforms/superset
+      tags: [platforms, superset]
+
+    - role: platforms/llm-broker
+      tags: [platforms, llm-broker]
+
+
+# ORCHESTRATION
+- name: Orchestration services
+  hosts: orchestrations
+  become: true
+  roles:
+    - role: orchestrations/kind
+      tags: [orchestrations, kind]
+
+    - role: orchestrations/kubernetes
+      tags: [orchestrations, kubernetes]
+
+    - role: orchestrations/temporal
+      tags: [orchestrations, temporal]
+
+
+# DATABASES
+- name: Database services
+  hosts: databases
+  become: true
+  roles:
+    - role: databases/postgres
+      tags: [databases, postgres]
+
+    - role: databases/redis
+      tags: [databases, redis]
+
+    - role: databases/elasticsearch
+      tags: [databases, elasticsearch]
+
+    - role: databases/kibana
+      tags: [databases, kibana]
+
+    - role: databases/aerospike
+      tags: [databases, aerospike]
+
+    - role: databases/yugabytedb
+      tags: [databases, yugabytedb]
+
+    - role: databases/scylladb
+      tags: [databases, scylladb]
+
+    - role: databases/tigerbeetle
+      tags: [databases, tigerbeetle]
+
+    - role: databases/ferretdb
+      tags: [databases, ferretdb]
+
+    - role: databases/qdrant
+      tags: [databases, qdrant]
+
+    - role: databases/clickhouse
+      tags: [databases, clickhouse]
+
+
+# MESSAGING
+- name: Messaging services
+  hosts: messagings
+  become: true
+  roles:
+    - role: messagings/rabbitmq
+      tags: [messagings, rabbitmq]
+
+    - role: messagings/debezium
+      tags: [messagings, debezium]
+
+
+# STORAGE
+- name: Storage services
+  hosts: storages
+  become: true
+  roles:
+    - role: storages/minio
+      tags: [storages, minio]
+
+
+# IAM / SECURITY
+- name: IAM services
+  hosts: iam
+  become: true
+  roles:
+    - role: iam/keycloak
+      tags: [iam, keycloak]
+
+
+# OBSERVABILITY
+- name: Observability stack
+  hosts: observability
+  become: true
+  roles:
+    - role: observability/prometheus
+      tags: [observability, prometheus]
+
+    - role: observability/grafana
+      tags: [observability, grafana]
+
+    - role: observability/node-exporter
+      tags: [observability, node-exporter]
+
+    - role: observability/loki
+      tags: [observability, loki]
+
+    - role: observability/tempo
+      tags: [observability, tempo]
+
+    - role: observability/mimir
+      tags: [observability, mimir]
+
+    - role: observability/opentelemetry
+      tags: [observability, opentelemetry]
+
+
+# TESTING (NON-PROD)
+- name: Testing tools
+  hosts: testings
+  become: true
+  roles:
+    - role: testings/k6
+      tags: [testings, k6]
+
+
+# APPLICATIONS
+- name: Applications
+  hosts: apps
+  become: true
+  roles:
+    - role: apps/application
+      tags: [apps]
+
+    - role: apps/qr-gen
+      tags: [apps, qr-gen]
+
+    - role: apps/paperclip
+      tags: [apps, paperclip]

@@ -1,0 +1,13 @@
+---
+opentelemetry_version: "0.99.0"
+
+opentelemetry_install_dir: "/opt/opentelemetry"
+
+opentelemetry_container_name: "opentelemetry"
+
+opentelemetry_ports:
+  - "4319:4317"
+  - "4320:4318"
+  - "8890:8888"
+
+opentelemetry_restart_policy: unless-stopped
