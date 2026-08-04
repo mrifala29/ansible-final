@@ -3,10 +3,27 @@
 # yugabyted manages its own configuration via --master_flags / --tserver_flags.
 
 cluster_name={{ yugabytedb_cluster_name }}
+version={{ yugabytedb_version }}
+
+# yugabyted start flags (set in docker-compose)
+# --daemon=false
+# --ui=false
+# --callhome=false
+# --base_dir=/home/yugabyte/var
+# --tserver_flags=pgsql_proxy_bind_address=0.0.0.0:5433,cql_proxy_bind_address=0.0.0.0:9042
+#
+# PENTING: jangan pass 'cluster_name' ke --master_flags — yb-master di 2.21.x
+# tidak mengenal flag tersebut (crash loop: "unknown command line flag
+# 'cluster_name'"). Identitas cluster di-generate otomatis oleh yugabyted
+# via --cluster_uuid.
 
 # External host ports (host:container mapping)
 # master_webserver_port : {{ yugabytedb_master_port }}:7000   -> http://host:{{ yugabytedb_master_port }}
 # tserver_webserver_port: {{ yugabytedb_tserver_port }}:9000  -> http://host:{{ yugabytedb_tserver_port }}
-# ysql (postgres)       : {{ yugabytedb_ysql_port }}:5433     -> psql -h host -p {{ yugabytedb_ysql_port }}
+# ysql (postgres)       : {{ yugabytedb_ysql_port }}:5433     -> psql -h host -p {{ yugabytedb_ysql_port }} -U yugabyte
 # ycql (cassandra)      : {{ yugabytedb_yql_port }}:9042
 # yugabyted UI          : 15433:15433                         -> http://host:15433
+
+# Data directory
+# host : {{ yugabytedb_data_dir }}
+# container: /home/yugabyte/var

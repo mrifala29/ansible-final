@@ -6,12 +6,17 @@ services:
       - bin/yugabyted
       - start
       - --daemon=false
-      - --advertise_address=0.0.0.0
+      - --ui=false
+      - --callhome=false
       - --base_dir=/home/yugabyte/var
-      - --data_dir=/home/yugabyte/yb_data
-      - --log_dir=/home/yugabyte/yb_logs
-      - --tserver_flags=pgsql_proxy_bind_address=0.0.0.0:5433,ysql_enable_auth=false
-      - --master_flags=cluster_name={{ yugabytedb_cluster_name }},use_memory_defaults_optimized_for_ysql=true
+      # NOTE: JANGAN pass 'cluster_name' ke --master_flags. Flag itu TIDAK
+      # dikenal yb-master di versi 2.21.x -> crash loop (unknown command line
+      # flag 'cluster_name'). Identitas cluster ditangani otomatis oleh
+      # yugabyted via --cluster_uuid. yugabyted juga otomatis mengisi
+      # rpc_bind_addresses/webserver_interface dengan IP container.
+      # Yang kita override hanya proxy bind address agar YSQL/YCQL bisa
+      # diakses dari luar container (docker port mapping).
+      - --tserver_flags=pgsql_proxy_bind_address=0.0.0.0:5433,cql_proxy_bind_address=0.0.0.0:9042
     ports:
       - "{{ yugabytedb_master_port }}:7000"
       - "{{ yugabytedb_tserver_port }}:9000"
@@ -19,8 +24,7 @@ services:
       - "{{ yugabytedb_ysql_port }}:5433"
       - "15433:15433"
     volumes:
-      - "{{ yugabytedb_data_dir }}:/home/yugabyte/yb_data"
-      - "{{ yugabytedb_log_dir }}:/home/yugabyte/yb_logs"
+      - "{{ yugabytedb_data_dir }}:/home/yugabyte/var"
     ulimits:
       nofile:
         soft: 1048576

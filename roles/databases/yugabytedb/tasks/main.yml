@@ -30,52 +30,96 @@
     state: link
     force: yes
 
+- name: Stop and remove old yugabytedb container
+  shell: docker stop yugabytedb && docker rm yugabytedb || true
+  changed_when: false
+
+- name: Clean stale data
+  file:
+    path: "{{ yugabytedb_data_dir }}"
+    state: absent
+
 - name: Create directories
   file:
     path: "{{ item }}"
     state: directory
-    mode: '0755'
-    owner: '1000'
-    group: '1000'
+    mode: '0777'
   loop:
     - "{{ yugabytedb_base_dir }}"
     - "{{ yugabytedb_data_dir }}"
-    - "{{ yugabytedb_log_dir }}"
     - "{{ yugabytedb_conf_dir }}"
 
 - name: Generate yugabytedb config
   template:
     src: yugabytedb.conf.j2
     dest: "{{ yugabytedb_conf_dir }}/yugabytedb.conf"
-  notify: restart yugabytedb
 
 - name: Generate docker-compose.yml
   template:
     src: docker-compose.j2
     dest: "{{ docker_compose_path }}"
-  notify: restart yugabytedb
 
 - name: Start YugabyteDB
-  command: docker-compose -f {{ docker_compose_path }} up -d
+  command: docker-compose -f {{ docker_compose_path }} up -d --force-recreate
   register: compose_up
-  changed_when: "'Started' in compose_up.stdout or 'Creating' in compose_up.stdout"
 
-- name: Wait for YSQL port
-  wait_for:
-    host: 127.0.0.1
-    port: "{{ yugabytedb_ysql_port }}"
-    delay: 10
-    timeout: 120
+- name: Wait for container running
+  shell: docker ps --filter name=yugabytedb --filter status=running -q
+  register: container_check
+  retries: 10
+  delay: 5
+  until: container_check.stdout | length > 0
+  changed_when: false
+
+- name: Show container logs if not running
+  shell: docker logs --tail 30 yugabytedb 2>&1
+  register: yb_logs
+  when: container_check is failed
+  ignore_errors: yes
+
+- name: Debug container logs
+  debug:
+    var: yb_logs.stdout_lines
+  when: yb_logs is defined and yb_logs.stdout_lines is defined
+
+- name: Install postgresql-client
+  apt:
+    name: postgresql-client
+    state: present
+
+- name: Wait for YSQL ready
+  shell: psql -h 127.0.0.1 -p {{ yugabytedb_ysql_port }} -U yugabyte -d yugabyte -c 'SELECT 1' 2>&1
+  environment:
+    PGPASSWORD: ""
+  register: ysql_check
+  retries: 30
+  delay: 10
+  until: ysql_check.rc == 0
+  changed_when: false
+  ignore_errors: yes
+
+- name: Show YugabyteDB container logs if YSQL not ready
+  shell: docker logs --tail 80 yugabytedb 2>&1
+  register: yb_error_logs
+  changed_when: false
+  when: ysql_check.rc != 0
+
+- name: Print YugabyteDB container logs for debugging
+  debug:
+    var: yb_error_logs.stdout_lines
+  when: yb_error_logs.stdout_lines is defined
+
+- name: Fail if YSQL is not ready
+  fail:
+    msg: "YSQL port {{ yugabytedb_ysql_port }} is not accepting connections after 30 retries. Check container logs above."
+  when: ysql_check.rc != 0
 
 - name: Create linkit-dev user
-  command: >
-    docker exec yugabytedb
-    ysqlsh -h 127.0.0.1 -p 5433 -U yugabyte -d yugabyte -c
-    "DO $$ BEGIN
-       IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '{{ yugabytedb_username }}') THEN
-         CREATE ROLE {{ yugabytedb_username }} WITH LOGIN PASSWORD '{{ yugabytedb_password }}' SUPERUSER;
-       END IF;
-     END $$;"
+  shell: >-
+    psql -h 127.0.0.1 -p {{ yugabytedb_ysql_port }} -U yugabyte -d yugabyte
+    -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '{{ yugabytedb_username }}') THEN CREATE ROLE {{ yugabytedb_username }} WITH LOGIN PASSWORD '{{ yugabytedb_password }}' SUPERUSER; END IF; END \$\$;"
+  environment:
+    PGPASSWORD: ""
   register: create_user
-  changed_when: false
+  changed_when: "'CREATE ROLE' in create_user.stdout"
   ignore_errors: yes
