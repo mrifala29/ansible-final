@@ -1,16 +1,17 @@
-yugabytedb_version: "2.21.0.0-b545"
+yugabytedb_version: "2.21.1.0-b271"
+yugabytedb_cluster_name: "dev-cluster"
+yugabytedb_username: "linkit-dev"
+yugabytedb_password: "linkit-dev"
 
-yugabytedb_base_dir: "/opt/yugabytedb"
-yugabytedb_data_dir: "/opt/yugabytedb/data"
-yugabytedb_log_dir: "/opt/yugabytedb/logs"
-yugabytedb_conf_dir: "/opt/yugabytedb/conf"
+yugabytedb_base_dir: "/data/databases/yugabytedb"
+yugabytedb_data_dir: "/data/databases/yugabytedb/data"
+yugabytedb_log_dir: "/data/databases/yugabytedb/logs"
+yugabytedb_conf_dir: "/data/databases/yugabytedb/conf"
 
-yugabytedb_master_port: 7000
-yugabytedb_tserver_port: 9000
-yugabytedb_yql_port: 9042
-yugabytedb_ysql_port: 5433
+yugabytedb_master_port: 7111
+yugabytedb_tserver_port: 9111
+yugabytedb_yql_port: 9142
+yugabytedb_ysql_port: 5533
 
-yugabytedb_cluster_name: "yb-cluster"
-
-docker_compose_path: "/opt/yugabytedb/docker-compose.yml"
+docker_compose_path: "/data/databases/yugabytedb/docker-compose.yml"
 docker_compose_version: "v2.25.0"

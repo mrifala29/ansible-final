@@ -5,8 +5,8 @@
 cluster_name={{ yugabytedb_cluster_name }}
 
 # External host ports (host:container mapping)
-# master_webserver_port : {{ yugabytedb_master_port }}:7000
-# tserver_webserver_port: {{ yugabytedb_tserver_port }}:9000
-# ysql (postgres)       : {{ yugabytedb_ysql_port }}:5433
+# master_webserver_port : {{ yugabytedb_master_port }}:7000   -> http://host:{{ yugabytedb_master_port }}
+# tserver_webserver_port: {{ yugabytedb_tserver_port }}:9000  -> http://host:{{ yugabytedb_tserver_port }}
+# ysql (postgres)       : {{ yugabytedb_ysql_port }}:5433     -> psql -h host -p {{ yugabytedb_ysql_port }}
 # ycql (cassandra)      : {{ yugabytedb_yql_port }}:9042
-# yugabyted UI          : 15433:15433
+# yugabyted UI          : 15433:15433                         -> http://host:15433
