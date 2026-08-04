@@ -114,12 +114,11 @@
     msg: "YSQL port {{ yugabytedb_ysql_port }} is not accepting connections after 30 retries. Check container logs above."
   when: ysql_check.rc != 0
 
-- name: Create linkit-dev user
+- name: Create {{ yugabytedb_username }} user
   shell: >-
     psql -h 127.0.0.1 -p {{ yugabytedb_ysql_port }} -U yugabyte -d yugabyte
-    -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '{{ yugabytedb_username }}') THEN CREATE ROLE {{ yugabytedb_username }} WITH LOGIN PASSWORD '{{ yugabytedb_password }}' SUPERUSER; END IF; END \$\$;"
+    -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '{{ yugabytedb_username }}') THEN CREATE ROLE \"{{ yugabytedb_username }}\" WITH LOGIN PASSWORD '{{ yugabytedb_password }}' SUPERUSER; END IF; END \$\$;"
   environment:
     PGPASSWORD: ""
   register: create_user
   changed_when: "'CREATE ROLE' in create_user.stdout"
-  ignore_errors: yes

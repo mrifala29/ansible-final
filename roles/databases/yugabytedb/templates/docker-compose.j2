@@ -6,7 +6,7 @@ services:
       - bin/yugabyted
       - start
       - --daemon=false
-      - --ui=false
+      - --ui=true
       - --callhome=false
       - --base_dir=/home/yugabyte/var
       # NOTE: JANGAN pass 'cluster_name' ke --master_flags. Flag itu TIDAK
