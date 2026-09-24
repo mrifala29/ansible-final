@@ -1,0 +1,105 @@
+---
+# User setup
+- name: Create ferretdb group
+  group:
+    name: "{{ ferretdb_group }}"
+    system: true
+  tags:
+    - ferretdb
+    - ferretdb_install
+
+- name: Create ferretdb user
+  user:
+    name: "{{ ferretdb_user }}"
+    group: "{{ ferretdb_group }}"
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+  tags:
+    - ferretdb
+    - ferretdb_install
+
+# Directories
+- name: Create install directory
+  file:
+    path: "{{ ferretdb_install_dir }}"
+    state: directory
+    owner: "{{ ferretdb_user }}"
+    group: "{{ ferretdb_group }}"
+    mode: "0755"
+  tags:
+    - ferretdb
+    - ferretdb_install
+
+- name: Create state directory
+  file:
+    path: "{{ ferretdb_state_dir }}"
+    state: directory
+    owner: "{{ ferretdb_user }}"
+    group: "{{ ferretdb_group }}"
+    mode: "0755"
+  tags:
+    - ferretdb
+    - ferretdb_install
+
+- name: Create data directory
+  file:
+    path: "{{ ferretdb_data_dir }}"
+    state: directory
+    owner: "{{ ferretdb_user }}"
+    group: "{{ ferretdb_group }}"
+    mode: "0755"
+  tags:
+    - ferretdb
+    - ferretdb_install
+
+# Binary
+- name: Download FerretDB binary
+  get_url:
+    url: "https://github.com/FerretDB/FerretDB/releases/download/v{{ ferretdb_version }}/ferretdb-linux-{{ ferretdb_arch }}"
+    dest: "{{ ferretdb_install_dir }}/ferretdb"
+    mode: "0755"
+    owner: "{{ ferretdb_user }}"
+    group: "{{ ferretdb_group }}"
+  tags:
+    - ferretdb
+    - ferretdb_install
+
+# Service config
+- name: Install systemd service
+  template:
+    src: ferretdb.service.j2
+    dest: /etc/systemd/system/ferretdb.service
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart ferretdb
+  tags:
+    - ferretdb
+    - ferretdb_config
+
+- name: Flush handlers
+  meta: flush_handlers
+  tags:
+    - ferretdb
+    - ferretdb_service
+
+# Service state
+- name: Enable and start FerretDB
+  systemd:
+    name: ferretdb
+    enabled: true
+    state: started
+  tags:
+    - ferretdb
+    - ferretdb_service
+
+# Verification
+- name: Wait for FerretDB port
+  wait_for:
+    host: "{{ '127.0.0.1' if ferretdb_listen_host == '0.0.0.0' else ferretdb_listen_host }}"
+    port: "{{ ferretdb_port }}"
+    timeout: 30
+  tags:
+    - ferretdb
+    - ferretdb_verify

@@ -1,0 +1,36 @@
+[Unit]
+Description=FerretDB
+After=network.target{% if ferretdb_handler == 'postgresql' %} postgresql.service{% endif %}
+
+[Service]
+User={{ ferretdb_user }}
+Group={{ ferretdb_group }}
+WorkingDirectory={{ ferretdb_state_dir }}
+ExecStart={{ ferretdb_install_dir }}/ferretdb \
+  --handler={{ ferretdb_handler }} \
+{% if ferretdb_handler == 'postgresql' %}
+  --postgresql-url={{ ferretdb_postgresql_url }} \
+{% elif ferretdb_handler == 'sqlite' %}
+  --sqlite-url={{ ferretdb_sqlite_url }} \
+{% endif %}
+  --listen-addr={{ ferretdb_listen_host }}:{{ ferretdb_port }} \
+{% if ferretdb_debug_port %}
+  --debug-addr={{ ferretdb_debug_host }}:{{ ferretdb_debug_port }} \
+{% else %}
+  --debug-addr="" \
+{% endif %}
+  --state-dir={{ ferretdb_state_dir }} \
+{% if ferretdb_auth_enabled | default(false) %}
+  --test-enable-new-auth \
+  --setup-database={{ ferretdb_database }} \
+  --setup-username={{ ferretdb_username }} \
+  --setup-password={{ ferretdb_password }} \
+{% endif %}
+  --telemetry={{ ferretdb_telemetry }} \
+  --log-level={{ ferretdb_log_level }}
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

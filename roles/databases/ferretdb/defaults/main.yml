@@ -1,0 +1,41 @@
+---
+# FerretDB defaults
+ferretdb_version: "1.24.1"
+ferretdb_arch: "amd64"
+
+# User & group
+ferretdb_user: ferretdb
+ferretdb_group: ferretdb
+
+# Directories
+ferretdb_install_dir: /opt/ferretdb
+ferretdb_data_dir: /var/lib/ferretdb/data
+ferretdb_state_dir: /var/lib/ferretdb
+
+# Network ports
+ferretdb_listen_host: "0.0.0.0"
+ferretdb_port: 27017
+ferretdb_debug_host: "127.0.0.1"
+ferretdb_debug_port: 27018
+
+# Backend handler
+ferretdb_handler: "sqlite"
+ferretdb_sqlite_url: "file:{{ ferretdb_data_dir }}/"
+
+# Authentication
+ferretdb_auth_enabled: false
+ferretdb_database: "ferretdb"
+ferretdb_username: ""
+ferretdb_password: ""
+
+# PostgreSQL config
+ferretdb_pg_host: "127.0.0.1"
+ferretdb_pg_port: 5432
+ferretdb_pg_user: ""
+ferretdb_pg_password: ""
+ferretdb_pg_db: "ferretdb"
+ferretdb_postgresql_url: "postgres://{{ ferretdb_pg_user }}:{{ ferretdb_pg_password }}@{{ ferretdb_pg_host }}:{{ ferretdb_pg_port }}/{{ ferretdb_pg_db }}"
+
+# General settings
+ferretdb_telemetry: "disable"
+ferretdb_log_level: "INFO"
