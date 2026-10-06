@@ -1,0 +1,5 @@
+---
+- name: Restart seaweedfs
+  community.docker.docker_compose_v2:
+    project_src: "{{ seaweedfs_compose_dir }}"
+    state: restarted

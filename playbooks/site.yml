@@ -115,6 +115,9 @@
     - role: storages/minio
       tags: [storages, minio]
 
+    - role: storages/seaweedfs
+      tags: [storages, seaweedfs]
+
 
 # IAM / SECURITY
 - name: IAM services

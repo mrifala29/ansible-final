@@ -1,0 +1,42 @@
+---
+- name: Ensure SeaweedFS directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ seaweedfs_data_dir }}"
+    - "{{ seaweedfs_compose_dir }}"
+
+- name: Render .env for SeaweedFS
+  copy:
+    dest: "{{ seaweedfs_compose_dir }}/.env"
+    content: |
+      AWS_ACCESS_KEY_ID={{ seaweedfs_s3_access_key }}
+      AWS_SECRET_ACCESS_KEY={{ seaweedfs_s3_secret_key }}
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Render s3.json for SeaweedFS
+  template:
+    src: s3.json.j2
+    dest: "{{ seaweedfs_compose_dir }}/s3.json"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Render docker compose file for SeaweedFS
+  template:
+    src: docker-compose.j2
+    dest: "{{ seaweedfs_compose_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Start SeaweedFS via docker compose v2
+  community.docker.docker_compose_v2:
+    project_src: "{{ seaweedfs_compose_dir }}"
+    state: present
