@@ -1,4 +1,2 @@
 - name: restart clickhouse
-  command: docker compose restart
-  args:
-    chdir: /opt/clickhouse
+  command: "docker compose -f {{ clickhouse_base_dir }}/docker-compose.yml restart"

@@ -2,9 +2,14 @@ clickhouse_image: clickhouse/clickhouse-server:latest
 
 clickhouse_container_name: clickhouse
 
+clickhouse_base_dir: /opt/clickhouse
+clickhouse_data_dir: /data/clickhouse
+clickhouse_config_dir: "{{ clickhouse_base_dir }}/config"
+
 clickhouse_ports:
   - "8123:8123"
   - "9123:9000"
 
-clickhouse_data_dir: /opt/clickhouse/data
-clickhouse_config_dir: /opt/clickhouse/config
+clickhouse_user: LinkIT360
+clickhouse_password: "@RnD123!"
+clickhouse_access_management: true
