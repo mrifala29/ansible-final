@@ -6,9 +6,11 @@ clickhouse_base_dir: /opt/clickhouse
 clickhouse_data_dir: /data/clickhouse
 clickhouse_config_dir: "{{ clickhouse_base_dir }}/config"
 
+clickhouse_http_port: 8123
+clickhouse_tcp_port: 9123
 clickhouse_ports:
-  - "8123:8123"
-  - "9123:9000"
+  - "{{ clickhouse_http_port }}:8123"
+  - "{{ clickhouse_tcp_port }}:9000"
 
 clickhouse_user: LinkIT360
 clickhouse_password: "@RnD123!"
