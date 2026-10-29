@@ -1,0 +1,15 @@
+services:
+  openproject:
+    image: {{ openproject_image }}
+    container_name: openproject
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:{{ openproject_port }}:80"
+    environment:
+      SECRET_KEY_BASE: "{{ openproject_secret_key_base }}"
+      OPENPROJECT_HOST__NAME: "{{ openproject_host }}"
+      OPENPROJECT_HTTPS: "{{ openproject_https }}"
+      OPENPROJECT_DEFAULT__LANGUAGE: "{{ openproject_default_language }}"
+    volumes:
+      - {{ openproject_base_dir }}/pgdata:/var/openproject/pgdata
+      - {{ openproject_base_dir }}/assets:/var/openproject/assets

@@ -1,0 +1,30 @@
+---
+- name: Ensure Gauzy base directory exists
+  file:
+    path: "{{ gauzy_base_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure Gauzy pgdata directory exists with secure permissions
+  file:
+    path: "{{ gauzy_base_dir }}/pgdata"
+    state: directory
+    owner: "70"
+    group: "70"
+    mode: "0700"
+
+- name: Copy Gauzy docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ gauzy_base_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart gauzy
+
+- name: Start Gauzy containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ gauzy_base_dir }}"
+    state: present

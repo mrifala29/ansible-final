@@ -1,0 +1,5 @@
+---
+- name: Restart gauzy
+  community.docker.docker_compose_v2:
+    project_src: "{{ gauzy_base_dir }}"
+    state: restarted

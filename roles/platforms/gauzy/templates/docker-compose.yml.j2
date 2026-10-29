@@ -1,0 +1,66 @@
+services:
+  db:
+    image: {{ gauzy_db_image }}
+    container_name: gauzy-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "{{ gauzy_db_name }}"
+      POSTGRES_USER: "{{ gauzy_db_user }}"
+      POSTGRES_PASSWORD: "{{ gauzy_db_password }}"
+    volumes:
+      - {{ gauzy_base_dir }}/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ gauzy_db_user }} -d {{ gauzy_db_name }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: {{ gauzy_api_image }}
+    container_name: gauzy-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      API_HOST: 0.0.0.0
+      API_PORT: 3000
+      DB_TYPE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: "{{ gauzy_db_name }}"
+      DB_USER: "{{ gauzy_db_user }}"
+      DB_PASS: "{{ gauzy_db_password }}"
+      API_BASE_URL: "{{ gauzy_api_base_url }}"
+      CLIENT_BASE_URL: "{{ gauzy_client_base_url }}"
+      JWT_SECRET: "{{ gauzy_jwt_secret }}"
+      JWT_REFRESH_TOKEN_SECRET: "{{ gauzy_jwt_refresh_token_secret }}"
+      JWT_VERIFICATION_TOKEN_SECRET: "{{ gauzy_jwt_verification_token_secret }}"
+      EXPRESS_SESSION_SECRET: "{{ gauzy_express_session_secret }}"
+      DEMO_SUPER_ADMIN_PASSWORD: "{{ gauzy_super_admin_password }}"
+      DEMO_ADMIN_PASSWORD: "{{ gauzy_admin_password }}"
+      DEMO_EMPLOYEE_PASSWORD: "{{ gauzy_employee_password }}"
+      ALLOWED_ORIGINS: "{{ gauzy_allowed_origins }}"
+    ports:
+      - "127.0.0.1:{{ gauzy_api_port }}:3000"
+
+  webapp:
+    image: {{ gauzy_webapp_image }}
+    container_name: gauzy-webapp
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      API_BASE_URL: "{{ gauzy_api_base_url }}"
+    ports:
+      - "127.0.0.1:{{ gauzy_webapp_port }}:4200"
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: {{ gauzy_network_subnet }}

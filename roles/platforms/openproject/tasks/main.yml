@@ -1,0 +1,40 @@
+---
+- name: Ensure OpenProject base directory exists
+  file:
+    path: "{{ openproject_base_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure OpenProject pgdata directory exists with strict permissions
+  file:
+    path: "{{ openproject_base_dir }}/pgdata"
+    state: directory
+    owner: "102"
+    group: "107"
+    mode: "0700"
+
+- name: Ensure OpenProject assets directory exists
+  file:
+    path: "{{ openproject_base_dir }}/assets"
+    state: directory
+    owner: root
+    group: root
+    mode: "0777"
+
+- name: Copy OpenProject docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ openproject_base_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart openproject
+
+- name: Start OpenProject container
+  community.docker.docker_compose_v2:
+    project_src: "{{ openproject_base_dir }}"
+    state: present
+
+

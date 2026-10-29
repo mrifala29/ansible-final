@@ -1,12 +1,12 @@
-- name: Add Kubernetes apt key
-  apt_key:
-    url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+- name: Add Kubernetes repository
+  deb822_repository:
+    name: kubernetes
+    types: [deb]
+    uris: https://pkgs.k8s.io/core:/stable:/v1.29/deb/
+    suites: /
+    signed_by: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
     state: present
 
-- name: Add Kubernetes repo
-  apt_repository:
-    repo: "deb https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
-    state: present
 
 - name: Install kubelet kubeadm kubectl
   apt:

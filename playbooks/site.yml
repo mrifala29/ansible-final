@@ -40,6 +40,14 @@
     - role: platforms/llm-broker
       tags: [platforms, llm-broker]
 
+    - role: platforms/openproject
+      tags: [platforms, openproject]
+
+    - role: platforms/gauzy
+      tags: [platforms, gauzy]
+
+
+
 
 # ORCHESTRATION
 - name: Orchestration services

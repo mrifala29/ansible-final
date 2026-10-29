@@ -1,12 +1,13 @@
-- name: Add Grafana GPG key
-  apt_key:
-    url: https://packages.grafana.com/gpg.key
+- name: Add Grafana repository
+  deb822_repository:
+    name: grafana
+    types: [deb]
+    uris: https://packages.grafana.com/oss/deb
+    suites: stable
+    components: [main]
+    signed_by: https://packages.grafana.com/gpg.key
     state: present
 
-- name: Add Grafana repository
-  apt_repository:
-    repo: deb https://packages.grafana.com/oss/deb stable main
-    state: present
 
 - name: Install Grafana
   apt:

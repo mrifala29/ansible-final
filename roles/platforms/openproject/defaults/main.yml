@@ -1,0 +1,12 @@
+---
+# Defaults for OpenProject (Dummy values for role independence)
+openproject_base_dir: /opt/platforms/openproject
+openproject_port: 8089
+openproject_image_tag: "15"
+openproject_image: "openproject/openproject:{{ openproject_image_tag }}"
+openproject_host: "openproject.linkit360.ai"
+openproject_https: "true"
+openproject_default_language: "en"
+
+# Secrets (Dummy fallback — overrides MUST be set in inventory/group_vars/platforms.yml)
+openproject_secret_key_base: "dummy_secret_key_base_change_in_group_vars_minimum_64_characters_long"

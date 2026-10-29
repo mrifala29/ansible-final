@@ -1,0 +1,27 @@
+---
+# Default configurations for Gauzy (dummy values for role independence)
+gauzy_base_dir: /opt/platforms/gauzy
+gauzy_webapp_port: 4200
+gauzy_api_port: 3005
+gauzy_webapp_image: "ghcr.io/ever-co/gauzy-webapp:latest"
+gauzy_api_image: "ghcr.io/ever-co/gauzy-api:latest"
+gauzy_db_image: "postgres:17-alpine"
+
+gauzy_webapp_host: "gauzy.linkit360.ai"
+gauzy_api_host: "api-gauzy.linkit360.ai"
+gauzy_api_base_url: "https://api-gauzy.linkit360.ai"
+gauzy_client_base_url: "https://gauzy.linkit360.ai"
+gauzy_network_subnet: "10.90.0.0/24"
+
+# Secrets (Dummy defaults - overrides MUST be in inventory/group_vars/platforms.yml)
+gauzy_db_name: "gauzy"
+gauzy_db_user: "gauzy"
+gauzy_db_password: "dummy_gauzy_password"
+gauzy_jwt_secret: "dummy_gauzy_jwt_secret_must_be_overridden_32chars_long"
+gauzy_jwt_refresh_token_secret: "dummy_gauzy_jwt_refresh_secret_must_be_overridden_32chars_long"
+gauzy_jwt_verification_token_secret: "dummy_gauzy_jwt_verification_secret_must_be_overridden_32chars_long"
+gauzy_express_session_secret: "dummy_gauzy_express_session_secret_must_be_overridden_32chars_long"
+gauzy_super_admin_password: "dummy_gauzy_super_admin_password_16chars"
+gauzy_admin_password: "dummy_gauzy_admin_password_16chars"
+gauzy_employee_password: "dummy_gauzy_employee_password_16chars"
+gauzy_allowed_origins: "https://gauzy.linkit360.ai,https://api-gauzy.linkit360.ai"

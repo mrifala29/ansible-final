@@ -1,13 +1,14 @@
 ---
-- name: Add k6 GPG key
-  apt_key:
-    url: https://dl.k6.io/key.gpg
+- name: Add k6 repository
+  deb822_repository:
+    name: k6
+    types: [deb]
+    uris: https://dl.k6.io/deb
+    suites: stable
+    components: [main]
+    signed_by: https://dl.k6.io/key.gpg
     state: present
 
-- name: Add k6 repository
-  apt_repository:
-    repo: deb https://dl.k6.io/deb stable main
-    state: present
 
 - name: Install k6
   apt:
